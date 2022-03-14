@@ -1,0 +1,20 @@
+---
+- name: yockgen Step 1
+  command: "{{ bin_dir }}/kubectl apply -f /home/yockgenm/whereabouts/doc/crds/daemonset-install.yaml"
+  run_once: true
+
+- name: yockgen Step 2
+  command: "{{ bin_dir }}/kubectl apply -f /home/yockgenm/whereabouts/doc/crds/whereabouts.cni.cncf.io_ippools.yaml"
+  run_once: true
+
+- name: yockgen Step 3
+  command: "{{ bin_dir }}/kubectl apply -f /home/yockgenm/whereabouts/doc/crds/whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml"
+  run_once: true
+
+- name: yockgen Step 4
+  command: "{{ bin_dir }}/kubectl apply -f /home/yockgenm/whereabouts/doc/crds/ip-reconciler-job.yaml"
+  run_once: true
+
+- name: yockgen Step 5
+  command: "{{bin_dir}}/kubectl apply -f /home/yockgenm/ovs-cni/examples/ovs-cni.yml"
+  run_once: true

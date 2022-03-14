@@ -1,4 +1,5 @@
 ---
+
 - name: Check ansible version
   import_playbook: ansible_version.yml
 
@@ -126,3 +127,12 @@
   roles:
     - { role: kubespray-defaults }
     - { role: kubernetes/preinstall, when: "dns_mode != 'none' and resolvconf_mode == 'host_resolvconf'", tags: resolvconf, dns_late: true }
+
+- name: yockgenm test - add whereabouts
+  hosts: kube_control_plane
+  gather_facts: False
+  any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
+  environment: "{{ proxy_disable_env }}"
+  roles:
+    - { role: kubespray-defaults }
+    - { role: yockgen_plugin }
