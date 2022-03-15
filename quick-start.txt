@@ -39,8 +39,8 @@ ansible-playbook -i inventory/mycluster/hosts.yml --become --become-user=root cl
 How to Test?
 ********************************************************************************************************************************************************************
 
-create network definition - ipvlan
-====================================
+create network definition - ipvlan (option 1)
+=============================================
 
 cat <<EOF | kubectl create -f -
 apiVersion: "k8s.cni.cncf.io/v1"
@@ -62,8 +62,15 @@ spec:
 EOF
 
 
-create network definition - OvS
-====================================
+create network definition - OvS (option 2)
+==========================================
+1. Ensure all nodes with OvS bridge call "yockgen-br1" setup, simple OvS bridge could be as simple as below:
+    
+    ovs-vsctl add-br ovs-br1 -- set bridge ovs-br1 datapath_type=netdev
+  
+   This guide will not cover installation of OvS, please refer to official OvS web site
+
+2.
 
 cat <<EOF | kubectl create -f -
 apiVersion: "k8s.cni.cncf.io/v1"
