@@ -1,3 +1,11 @@
+The guide is tested on 3 VMs cluster with Ubuntu 20.04 installed
+
+*******************************************************************************************************************************************************************
+Install Kubespray dependencies
+*******************************************************************************************************************************************************************
+1. Download this repo
+2. sudo pip install -r requirements.txt
+
 *******************************************************************************************************************************************************************
 Configure your own inventory 
 ********************************************************************************************************************************************************************
@@ -12,6 +20,14 @@ declare -a IPS=(192.168.0.17 192.168.0.18 192.168.0.19)
 CONFIG_FILE=inventory/mycluster/hosts.yml python3 contrib/inventory_builder/inventory.py ${IPS[@]}
 
 *You could change the configuration later by editing the inventory/mycluster/hosts.yml file
+
+ensure all nodes are accessible via SSH without password (example as below)
+============================================================================================================
+ssh-keygen -t rsa
+ssh-copy-id -i /home/yockgenm/.ssh/id_rsa.pub yockgenm@192.168.0.17
+ssh-copy-id -i /home/yockgenm/.ssh/id_rsa.pub yockgenm@192.168.0.18
+ssh-copy-id -i /home/yockgenm/.ssh/id_rsa.pub yockgenm@192.168.0.19
+ansible all -m ping
 
 *******************************************************************************************************************************************************************
 Create k8s cluster
