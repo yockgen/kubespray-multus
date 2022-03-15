@@ -1,0 +1,100 @@
+*******************************************************************************************************************************************************************
+Configure your own inventory 
+********************************************************************************************************************************************************************
+
+Duplicate sample inventory - not to mess up with clean sample
+==============================================================
+cp -rfp inventory/sample inventory/mycluster
+
+Configure all nodes IP would like to join the cluster - ensure all nodes are reachable via IP on each others
+============================================================================================================
+declare -a IPS=(192.168.0.17 192.168.0.18 192.168.0.19)
+CONFIG_FILE=inventory/mycluster/hosts.yml python3 contrib/inventory_builder/inventory.py ${IPS[@]}
+
+*You could change the configuration later by editing the inventory/mycluster/hosts.yml file
+
+*******************************************************************************************************************************************************************
+Create k8s cluster
+********************************************************************************************************************************************************************
+ansible-playbook -i inventory/mycluster/hosts.yml --become --become-user=root cluster.yml -K 
+
+
+*******************************************************************************************************************************************************************
+How to Test?
+********************************************************************************************************************************************************************
+
+create network definition - ipvlan
+====================================
+
+cat <<EOF | kubectl create -f -
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: yockgen-network
+spec:
+  config: '{
+    "cniVersion": "0.3.1",
+    "name": "yockgen-network",
+    "type": "ipvlan",
+	"master": "enp0s8",    
+    "capabilities": {"ips":true},
+    "ipam": {
+        "type": "whereabouts",
+        "range": "192.168.15.225/28"
+      }
+  }'
+EOF
+
+
+create network definition - OvS
+====================================
+
+cat <<EOF | kubectl create -f -
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: yockgen-network
+  annotations:
+    k8s.v1.cni.cncf.io/resourceName: ovs-cni.network.kubevirt.io/br1
+spec:
+  config: '{
+      "cniVersion": "0.3.0",
+      "type": "ovs",
+      "bridge": "yockgen-br1",
+      "vlan": 100,
+	  "ipam": {
+        "type": "whereabouts",
+        "range": "192.168.2.225/28"
+      }
+    }'
+EOF
+
+Sample Deployment
+=================
+cat <<EOF | kubectl create -f -
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test01-deployment
+  labels:
+    app: yockgen
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: test01pod
+  template:
+    metadata:      
+      annotations:
+        k8s.v1.cni.cncf.io/networks: yockgen-network
+      labels:
+        app: test01pod
+    spec:	
+      containers:
+      - name: test01pod
+        command: ["/bin/ash", "-c", "trap : TERM INT; sleep infinity & wait"]
+        image: alpine
+        securityContext:
+          capabilities:
+            add: ["NET_ADMIN", "SYS_TIME","NET_RAW"]
+EOF
