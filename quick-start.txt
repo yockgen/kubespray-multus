@@ -22,11 +22,11 @@ CONFIG_FILE=inventory/mycluster/hosts.yml python3 contrib/inventory_builder/inve
 *You could change the configuration later by editing the inventory/mycluster/hosts.yml file
 
 Change CNI plugin to calico
-======================================================================
+===================================
 nano +67 ./inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml
 
-Enable Multus plugin
-====================================================================
+Enable Multus plugin (set to true)
+===================================
 nano +70 ./inventory/mycluster/group_vars/k8s_cluster/k8s-cluster.yml
 
 ensure all nodes are accessible via SSH without password (example as below)
