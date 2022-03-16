@@ -27,7 +27,7 @@ ssh-keygen -t rsa
 ssh-copy-id -i /home/yockgenm/.ssh/id_rsa.pub yockgenm@192.168.0.17
 ssh-copy-id -i /home/yockgenm/.ssh/id_rsa.pub yockgenm@192.168.0.18
 ssh-copy-id -i /home/yockgenm/.ssh/id_rsa.pub yockgenm@192.168.0.19
-ansible all -m ping
+ansible all -i inventory -m ping
 
 *******************************************************************************************************************************************************************
 Create k8s cluster
