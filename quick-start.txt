@@ -69,6 +69,7 @@ spec:
   }'
 EOF
 
+Important note, please make sure the master interface (here is "enp0s8") in all nodes are up properly and pingable between each others 
 
 create network definition - OvS (option 2)
 ==========================================
