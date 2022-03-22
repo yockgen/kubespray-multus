@@ -42,6 +42,10 @@ Create k8s cluster
 ********************************************************************************************************************************************************************
 ansible-playbook -i inventory/mycluster/hosts.yml --become --become-user=root cluster.yml -K 
 
+To reset the cluster: 
+ansible-playbook -i inventory/mycluster/hosts.yml --become --become-user=root reset.yml -K 
+
+
 
 *******************************************************************************************************************************************************************
 How to Test?
