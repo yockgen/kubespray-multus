@@ -3,30 +3,30 @@
   become: yes
   git:
      repo: 'https://github.com/k8snetworkplumbingwg/whereabouts.git'
-     dest: "/home/yockgenm/temp/whereabouts"
+     dest: "{{ intel_temp_dir }}/whereabouts"
 
 - name: download ovs-cni plugin repo
   become: yes
   git:
      repo: 'https://github.com/k8snetworkplumbingwg/ovs-cni.git'
-     dest: "/home/yockgenm/temp/ovs-cni"
+     dest: "{{ intel_temp_dir }}/ovs-cni"
 
 - name: whereabouts plugin install daemon
-  command: "{{ bin_dir }}/kubectl apply -f /home/yockgenm/temp/whereabouts/doc/crds/daemonset-install.yaml"
+  command: "{{ bin_dir }}/kubectl apply -f {{ intel_temp_dir }}/whereabouts/doc/crds/daemonset-install.yaml"
   run_once: true
 
 - name: whereabouts plugin install ip pools
-  command: "{{ bin_dir }}/kubectl apply -f /home/yockgenm/temp/whereabouts/doc/crds/whereabouts.cni.cncf.io_ippools.yaml"
+  command: "{{ bin_dir }}/kubectl apply -f {{ intel_temp_dir }}/whereabouts/doc/crds/whereabouts.cni.cncf.io_ippools.yaml"
   run_once: true
 
 - name: whereabouts plugin install ip reservations
-  command: "{{ bin_dir }}/kubectl apply -f /home/yockgenm/temp/whereabouts/doc/crds/whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml"
+  command: "{{ bin_dir }}/kubectl apply -f {{ intel_temp_dir }}/whereabouts/doc/crds/whereabouts.cni.cncf.io_overlappingrangeipreservations.yaml"
   run_once: true
 
 - name: whereabouts plugin install ip reconciler
-  command: "{{ bin_dir }}/kubectl apply -f /home/yockgenm/temp/whereabouts/doc/crds/ip-reconciler-job.yaml"
+  command: "{{ bin_dir }}/kubectl apply -f {{ intel_temp_dir }}/whereabouts/doc/crds/ip-reconciler-job.yaml"
   run_once: true
 
 - name: ovs-cni plugin for ovs bridge
-  command: "{{bin_dir}}/kubectl apply -f /home/yockgenm/temp/ovs-cni/examples/ovs-cni.yml"
+  command: "{{bin_dir}}/kubectl apply -f {{ intel_temp_dir }}/ovs-cni/examples/ovs-cni.yml"
   run_once: true
