@@ -51,7 +51,7 @@ ansible-playbook -i inventory/mycluster/hosts.yml --become --become-user=root re
 How to Test?
 ********************************************************************************************************************************************************************
 
-create network definition - ipvlan (option 1)
+create network definition - macvlan (option 1)
 =============================================
 
 cat <<EOF | kubectl create -f -
@@ -63,17 +63,27 @@ spec:
   config: '{
     "cniVersion": "0.3.1",
     "name": "yockgen-network",
-    "type": "ipvlan",
-	"master": "enp0s8",    
-    "capabilities": {"ips":true},
+    "type": "macvlan",
+	"master": "ens8",
+    "mode": "bridge",           
+    "isDefaultGateway": false,
+    "forceAddress": false,
+    "ipMasq": false,
+    "hairpinMode": false,
     "ipam": {
-        "type": "whereabouts",
-        "range": "192.168.15.225/28"
-      }
+      "type": "host-local",
+      "subnet": "192.168.1.0/24",
+      "rangeStart": "192.168.1.201",
+      "rangeEnd": "192.168.1.250",
+      "routes": [
+        { "dst": "0.0.0.0/0" }
+      ],
+      "gateway": "192.168.1.1"
+    }
   }'
 EOF
 
-Important note, please make sure the master interface (here is "enp0s8") in all nodes are up properly and pingable between each others 
+Important note, please make sure the master interface (here is "ens8") in all nodes are up properly and pingable between each others 
 
 create network definition - OvS (option 2)
 ==========================================
