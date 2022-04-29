@@ -1,0 +1,80 @@
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: {{ .Values.networkId }}
+spec:
+  config: '{
+    "cniVersion": "0.3.1",
+    "name": "{{ .Values.networkId }}",
+    "type": "macvlan",
+    "master": "{{ .Values.networkcardId }}",
+    "mode": "bridge",           
+    "isDefaultGateway": false,
+    "forceAddress": false,
+    "ipMasq": false,
+    "hairpinMode": false,
+    "ipam": {
+        "type": "whereabouts",
+        "range": "{{ .Values.networkrangeCIDR }}"    }
+    }'
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "multus-demo.fullname" . }}
+  labels:
+    {{- include "multus-demo.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "multus-demo.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:      
+      annotations:
+        k8s.v1.cni.cncf.io/networks: {{ .Values.networkId }}      
+      labels:
+        {{- include "multus-demo.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "multus-demo.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          command: ["/bin/sleep","3650d"]
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

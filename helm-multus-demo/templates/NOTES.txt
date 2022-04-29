@@ -1,0 +1,10 @@
+Validating the deployment by running these commands:
+
+kubectl get pods -o wide -n default
+
+Validating second IP address on Pod's container, for example: 
+
+export FIRST_POD_NAME=$(kubectl get pods --namespace default -l "app.kubernetes.io/name=multus-demo,app.kubernetes.io/instance=yockgen-helm01" -o jsonpath="{.items[0].metadata.name}")
+kubectl exec -it $FIRST_POD_NAME -- ip a
+
+
