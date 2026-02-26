@@ -1,0 +1,3 @@
+[submodule "internal/maestrokb"]
+	path = internal/maestrokb
+	url = https://github.com/intel-sandbox/maestrokb.git
